@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "chippedgraver",
+  "version": "${version}",
+  "name": "Chipped Graver",
+  "description": "A tool to randomize Chipped mod blocks",
+  "authors": [
+    "Ceethru"
+  ],
+  "contact": {
+    "homepage": "https://github.com/yourusername/ChippedGraver",
+    "sources": "https://github.com/yourusername/ChippedGraver"
+  },
+  "license": "MIT",
+  "icon": "assets/chippedgraver/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.chippedgraver.fabric.ChippedGraverFabric"
+    ]
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "fabric-api": "*",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "chipped": "*"
+  },
+  "suggests": {
+    "chipped": "*"
+  }
+}

@@ -1,0 +1,3 @@
+This file is a placeholder for the randomizer_tool.png texture.
+You should create a 16x16 or 32x32 pixel texture for the tool.
+Suggested design: A chisel or graver tool icon, perhaps with a dice or random symbol.
