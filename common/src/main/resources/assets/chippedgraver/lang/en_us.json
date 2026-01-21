@@ -1,7 +1,8 @@
 {
-  "item.chippedgraver.randomizer_tool": "Chipped Randomizer",
-  "item.chippedgraver.randomizer_tool.description": "Right-click on Chipped blocks to randomize them within their variant group. Right-click in air to open filter menu.",
+  "item.chippedgraver.randomizer_tool": "Graver",
+  "item.chippedgraver.randomizer_tool.description": "Chipped Randomizer tool",
   "gui.chippedgraver.filter.title": "Block Filter",
   "gui.chippedgraver.filter.clear": "Clear All",
+  "gui.chippedgraver.filter.include_source": "Include Source Blocks",
   "gui.chippedgraver.filter.instruction": "Drag blocks from JEI to add filters. Right-click slots to remove."
 }

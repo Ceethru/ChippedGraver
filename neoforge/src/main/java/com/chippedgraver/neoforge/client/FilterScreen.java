@@ -1,8 +1,11 @@
 package com.chippedgraver.neoforge.client;
 
+import com.chippedgraver.common.ChippedGraver;
 import com.chippedgraver.common.util.BlockGroupUtil;
 import com.chippedgraver.common.util.FilterUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -22,6 +25,7 @@ import java.util.Set;
 
 public class FilterScreen extends AbstractContainerScreen<FilterMenu> {
     private final ItemStack toolStack;
+    private final int toolSlot;
     private final List<FilterSlot> filterSlots = new ArrayList<>();
     public static final int SLOT_SIZE = 18;
     public static final int SLOTS_PER_ROW = 9;
@@ -30,9 +34,11 @@ public class FilterScreen extends AbstractContainerScreen<FilterMenu> {
     public static final int SCREEN_WIDTH = 176;
     public static final int SCREEN_HEIGHT = 166;
     
-    public FilterScreen(FilterMenu menu, Inventory playerInventory, ItemStack stack) {
+    public FilterScreen(FilterMenu menu, Inventory playerInventory, ItemStack stack, int slot) {
         super(menu, playerInventory, Component.translatable("gui.chippedgraver.filter.title"));
+        // Use the actual stack from inventory, not a copy
         this.toolStack = stack;
+        this.toolSlot = slot;
         this.imageWidth = SCREEN_WIDTH;
         this.imageHeight = SCREEN_HEIGHT;
     }
@@ -141,16 +147,16 @@ public class FilterScreen extends AbstractContainerScreen<FilterMenu> {
         guiGraphics.drawString(this.font, this.title, 8, 6, 0xFFFFFF, true);
         
         // Draw instruction text with word wrapping and centering
+        // Position it at the bottom of the screen
         Component instruction = Component.translatable("gui.chippedgraver.filter.instruction");
         int textWidth = SCREEN_WIDTH - 16; // Leave 8 pixels margin on each side
-        int textY = SCREEN_HEIGHT - 30; // Start a bit higher to leave room for wrapping
         
         // Word wrap the text
         List<net.minecraft.util.FormattedCharSequence> lines = this.font.split(instruction, textWidth);
         
-        // Center the text vertically in the remaining space
+        // Position text at the bottom (leave some margin)
         int totalTextHeight = lines.size() * this.font.lineHeight;
-        int startY = SCREEN_HEIGHT - 20 - totalTextHeight;
+        int startY = SCREEN_HEIGHT - totalTextHeight - 10; // 10 pixels from bottom
         
         // Draw each line, centered horizontally
         int lineIndex = 0;
@@ -188,6 +194,26 @@ public class FilterScreen extends AbstractContainerScreen<FilterMenu> {
         
         // Render other tooltips (buttons, etc.)
         this.renderTooltip(guiGraphics, mouseX, mouseY);
+    }
+    
+    @Override
+    public void onClose() {
+        // Sync the filter data to the server via network packet
+        if (this.minecraft != null && this.minecraft.getConnection() != null && toolSlot >= 0) {
+            var customData = toolStack.get(DataComponents.CUSTOM_DATA);
+            CompoundTag nbt = customData != null ? customData.copyTag() : null;
+            if (nbt == null) {
+                nbt = new CompoundTag();
+            }
+            
+            com.chippedgraver.neoforge.network.SyncFilterPacket packet = 
+                new com.chippedgraver.neoforge.network.SyncFilterPacket(toolSlot, nbt);
+            this.minecraft.getConnection().send(packet);
+            
+            var filters = FilterUtil.getFilters(toolStack);
+            ChippedGraver.LOGGER.info("[FilterScreen] Closing filter screen. Sent {} filters to server (slot {})", filters.size(), toolSlot);
+        }
+        super.onClose();
     }
     
     @Override
